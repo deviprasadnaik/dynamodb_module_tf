@@ -7,8 +7,8 @@ resource "aws_dynamodb_table" "this" {
   range_key                   = var.data.range_key
   read_capacity               = var.read_capacity
   write_capacity              = var.write_capacity
-  stream_enabled              = var.stream_enabled
-  stream_view_type            = var.stream_view_type
+  stream_enabled              = var.data.is_global ? true : var.stream_enabled
+  stream_view_type            = var.data.is_global ? var.data.stream_view_type : var.stream_view_type
   table_class                 = var.data.table_class
   deletion_protection_enabled = var.data.deletion_protection_enabled
 
@@ -18,7 +18,7 @@ resource "aws_dynamodb_table" "this" {
   }
 
   point_in_time_recovery {
-    enabled = var.point_in_time_recovery_enabled
+    enabled = var.data.point_in_time_recovery_enabled
   }
 
   dynamic "attribute" {
@@ -45,7 +45,7 @@ resource "aws_dynamodb_table" "this" {
   }
 
   dynamic "replica" {
-    for_each = var.data.replica_regions
+    for_each = var.data.is_global ? toset(var.data.replica_regions) : toset([])
 
     content {
       region_name            = replica.value.region_name
@@ -82,4 +82,17 @@ resource "aws_dynamodb_table" "this" {
     delete = lookup(var.timeouts, "delete", null)
     update = lookup(var.timeouts, "update", null)
   }
+
+}
+
+resource "aws_kinesis_stream" "this" {
+  for_each    = var.data.enable_stream != null ? { "stream" = var.data.enable_stream } : {}
+  name        = each.value.name
+  shard_count = each.value.shard_count
+}
+
+resource "aws_dynamodb_kinesis_streaming_destination" "this" {
+  stream_arn                               = aws_kinesis_stream.this["stream"].arn
+  table_name                               = aws_dynamodb_table.this[0].name
+  approximate_creation_date_time_precision = var.data.enable_stream.approximate_creation_date_time_precision
 }

@@ -1,6 +1,8 @@
 {
     "data": {
         "name": "my-table-test1",
+        "is_global": false,
+        "stream_view_type": "KEYS_ONLY",
         "hash_key": "id",
         "range_key": "title",
         "table_class": "STANDARD",
@@ -36,6 +38,12 @@
                 "region_name": "us-east-1",
                 "propagate_tags": true
             }
-        ]
+        ],
+        "point_in_time_recovery_enabled": true,
+        "enable_stream": {
+            "name": "test",
+            "shard_count": 1,
+            "approximate_creation_date_time_precision": "MICROSECOND"
+        }
     }
 }
