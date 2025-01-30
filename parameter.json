@@ -1,0 +1,41 @@
+{
+    "data": {
+        "name": "my-table-test1",
+        "hash_key": "id",
+        "range_key": "title",
+        "table_class": "STANDARD",
+        "deletion_protection_enabled": "false",
+        "on_demand_throughput": {
+            "max_read_request_units": "1",
+            "max_write_request_units": "1"
+        },
+        "region": "us-east-1",
+        "attributes": [
+            {
+                "name": "id",
+                "type": "N"
+            },
+            {
+                "name": "title",
+                "type": "S"
+            }
+        ],
+        "tags": {
+            "Terraform": "true",
+            "Environment": "staging"
+        },
+        "global_secondary_indexes": [
+            {
+                "name": "TitleIndex",
+                "hash_key": "title",
+                "projection_type": "ALL"
+            }
+        ],
+        "replica_regions": [
+            {
+                "region_name": "us-east-1",
+                "propagate_tags": true
+            }
+        ]
+    }
+}
