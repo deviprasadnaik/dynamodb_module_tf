@@ -2,7 +2,6 @@
     "data": {
         "name": "my-table-test1",
         "is_global": false,
-        "stream_view_type": "KEYS_ONLY",
         "hash_key": "id",
         "range_key": "title",
         "table_class": "STANDARD",
@@ -20,12 +19,23 @@
             {
                 "name": "title",
                 "type": "S"
+            },
+            {
+                "name": "Timestamp",
+                "type": "S"
             }
         ],
         "tags": {
             "Terraform": "true",
             "Environment": "staging"
         },
+        "local_secondary_indexes": [
+            {
+                "name": "TimestampSortIndex",
+                "range_key": "Timestamp",
+                "projection_type": "ALL"
+            }
+        ],
         "global_secondary_indexes": [
             {
                 "name": "TitleIndex",

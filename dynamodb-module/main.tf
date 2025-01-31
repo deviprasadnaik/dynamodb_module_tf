@@ -8,7 +8,7 @@ resource "aws_dynamodb_table" "this" {
   read_capacity               = var.read_capacity
   write_capacity              = var.write_capacity
   stream_enabled              = var.data.is_global ? true : var.stream_enabled
-  stream_view_type            = var.data.is_global ? var.data.stream_view_type : var.stream_view_type
+  stream_view_type            = var.stream_view_type
   table_class                 = var.data.table_class
   deletion_protection_enabled = var.data.deletion_protection_enabled
 
@@ -27,6 +27,16 @@ resource "aws_dynamodb_table" "this" {
     content {
       name = attribute.value.name
       type = attribute.value.type
+    }
+  }
+
+  dynamic "local_secondary_index" {
+    for_each = var.data.local_secondary_indexes
+    content {
+      name               = local_secondary_index.value.name
+      non_key_attributes = lookup(local_secondary_index.value, "non_key_attributes", null)
+      projection_type    = local_secondary_index.value.projection_type
+      range_key          = local_secondary_index.value.range_key
     }
   }
 
@@ -81,6 +91,10 @@ resource "aws_dynamodb_table" "this" {
     create = lookup(var.timeouts, "create", null)
     delete = lookup(var.timeouts, "delete", null)
     update = lookup(var.timeouts, "update", null)
+  }
+
+  lifecycle {
+    ignore_changes = [stream_enabled, stream_view_type]
   }
 
 }
