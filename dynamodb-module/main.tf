@@ -1,20 +1,24 @@
 resource "aws_dynamodb_table" "this" {
-  count = var.create_table ? 1 : 0
+  count = var.data.create_table ? 1 : 0
 
   name                        = var.data.name
-  billing_mode                = var.billing_mode
+  billing_mode                = var.data.billing_mode
   hash_key                    = var.data.hash_key
   range_key                   = var.data.range_key
-  read_capacity               = var.read_capacity
-  write_capacity              = var.write_capacity
-  stream_enabled              = var.data.is_global ? true : var.stream_enabled
-  stream_view_type            = var.stream_view_type
+  read_capacity               = var.data.read_capacity
+  write_capacity              = var.data.write_capacity
+  stream_enabled              = var.data.stream_enabled
+  stream_view_type            = var.data.stream_view_type
   table_class                 = var.data.table_class
   deletion_protection_enabled = var.data.deletion_protection_enabled
 
-  ttl {
-    enabled        = var.ttl_enabled
-    attribute_name = var.ttl_attribute_name
+  dynamic "ttl" {
+    for_each = try(var.data.ttl, null) != null ? [var.data.ttl] : []
+
+    content {
+      enabled        = true
+      attribute_name = ttl.value.attribute_name
+    }
   }
 
   point_in_time_recovery {
@@ -65,9 +69,14 @@ resource "aws_dynamodb_table" "this" {
     }
   }
 
-  server_side_encryption {
-    enabled     = var.server_side_encryption_enabled
-    kms_key_arn = var.server_side_encryption_kms_key_arn
+  dynamic "server_side_encryption" {
+    for_each = try(var.data.server_side_encryption, null) != null ? [var.data.server_side_encryption] : []
+
+    content {
+      enabled     = true
+      kms_key_arn = var.data.server_side_encryption_kms_key_arn
+    }
+
   }
 
 
@@ -81,20 +90,20 @@ resource "aws_dynamodb_table" "this" {
   }
 
   tags = merge(
-    var.tags,
+    var.data.tags,
     {
       "Name" = var.data.name
     }
   )
 
-  timeouts {
-    create = lookup(var.timeouts, "create", null)
-    delete = lookup(var.timeouts, "delete", null)
-    update = lookup(var.timeouts, "update", null)
-  }
+  dynamic "timeouts" {
+    for_each = try(var.data.timeouts, null) != null ? [var.data.timeouts] : []
 
-  lifecycle {
-    ignore_changes = [stream_enabled, stream_view_type]
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+      update = timeouts.value.update
+    }
   }
 
 }
