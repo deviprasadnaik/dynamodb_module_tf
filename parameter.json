@@ -1,7 +1,6 @@
 {
     "data": {
         "name": "my-table-test1",
-        "is_global": false,
         "stream_enabled": false,
         "stream_view_type": "NEW_AND_OLD_IMAGES",
         "create_table": true,
@@ -13,7 +12,7 @@
         "table_class": "STANDARD",
         "deletion_protection_enabled": false,
         "ttl": {
-            "attribute_name": "ttl-att"
+            "attribute_name": "ttl-attribute"
         },
         "on_demand_throughput": {
             "max_read_request_units": "1",
@@ -52,22 +51,11 @@
                 "projection_type": "ALL"
             }
         ],
-        "replica_regions": [
-            {
-                "region_name": "us-east-1",
-                "propagate_tags": true
-            }
-        ],
         "timeouts": {
             "create": "10m",
             "delete": "60m",
             "update": "20m"
         },
-        "point_in_time_recovery_enabled": true,
-        "enable_stream": {
-            "name": "test",
-            "shard_count": 1,
-            "approximate_creation_date_time_precision": "MICROSECOND"
-        }
+        "point_in_time_recovery_enabled": true
     }
 }

@@ -35,7 +35,7 @@ resource "aws_dynamodb_table" "this" {
   }
 
   dynamic "local_secondary_index" {
-    for_each = var.data.local_secondary_indexes
+    for_each = try(var.data.local_secondary_indexes, [])
     content {
       name               = local_secondary_index.value.name
       non_key_attributes = lookup(local_secondary_index.value, "non_key_attributes", null)
@@ -45,7 +45,7 @@ resource "aws_dynamodb_table" "this" {
   }
 
   dynamic "global_secondary_index" {
-    for_each = var.data.global_secondary_indexes
+    for_each = try(var.data.global_secondary_indexes, [])
 
     content {
       name               = global_secondary_index.value.name
@@ -59,7 +59,7 @@ resource "aws_dynamodb_table" "this" {
   }
 
   dynamic "replica" {
-    for_each = var.data.is_global ? toset(var.data.replica_regions) : toset([])
+    for_each = try(var.data.replica_regions, [])
 
     content {
       region_name            = replica.value.region_name
@@ -76,9 +76,7 @@ resource "aws_dynamodb_table" "this" {
       enabled     = true
       kms_key_arn = var.data.server_side_encryption_kms_key_arn
     }
-
   }
-
 
   dynamic "on_demand_throughput" {
     for_each = length(var.data.on_demand_throughput) > 0 ? [var.data.on_demand_throughput] : []
@@ -108,14 +106,3 @@ resource "aws_dynamodb_table" "this" {
 
 }
 
-resource "aws_kinesis_stream" "this" {
-  for_each    = var.data.enable_stream != null ? { "stream" = var.data.enable_stream } : {}
-  name        = each.value.name
-  shard_count = each.value.shard_count
-}
-
-resource "aws_dynamodb_kinesis_streaming_destination" "this" {
-  stream_arn                               = aws_kinesis_stream.this["stream"].arn
-  table_name                               = aws_dynamodb_table.this[0].name
-  approximate_creation_date_time_precision = var.data.enable_stream.approximate_creation_date_time_precision
-}
