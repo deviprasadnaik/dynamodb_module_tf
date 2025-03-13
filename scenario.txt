@@ -1,0 +1,72 @@
+Scenario 1: Invalid Attribute Type
+
+Action:
+Pass an invalid data type to an attribute in the DynamoDB table schema.
+
+Data:
+{
+    "attributes": [
+        {
+            "name": "id",
+            "type": "X"
+        }
+    ]
+}
+
+Expected Result:
+Terraform should fail with an error message indicating that the attribute type is invalid. Allowed types are "S", "N", or "B".
+
+Scenario 2: Missing Required Attribute in Hash Key
+
+Action:
+Define a DynamoDB table without specifying a hash key.
+
+Data:
+{
+    "hash_key": null
+}
+Expected Result:
+Terraform should fail with an error message stating that the hash_key is required and cannot be null.
+
+Scenario 3: Invalid Billing Mode Configuration
+
+Action:
+Provide both PAY_PER_REQUEST billing mode and read_capacity/write_capacity values, which are mutually exclusive.
+
+Data:
+{
+    "billing_mode": "PAY_PER_REQUEST",
+    "read_capacity": 5,
+    "write_capacity": 5
+}
+
+Expected Result:
+Terraform should fail with an error message stating that read_capacity and write_capacity cannot be specified when billing_mode is set to PAY_PER_REQUEST.
+
+Scenario 4: Invalid Stream View Type
+
+Action:
+Provide an invalid stream_view_type value.
+
+Data:
+{
+    "stream_view_type": "INVALID_TYPE"
+}
+
+Expected Result:
+Terraform should fail with an error message indicating that the stream_view_type must be one of NEW_IMAGE, OLD_IMAGE, NEW_AND_OLD_IMAGES, or KEYS_ONLY.
+
+Scenario 5: Invalid TTL Attribute Name Format
+
+Action:
+Define a TTL attribute with an invalid name (e.g., numeric instead of string).
+
+Data:
+{
+    "ttl": {
+        "attribute_name": 1234
+    }
+}
+
+Expected Result:
+Terraform should fail with an error message stating that the TTL attribute name must be a string.
