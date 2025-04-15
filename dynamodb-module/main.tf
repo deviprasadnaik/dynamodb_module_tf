@@ -74,7 +74,7 @@ resource "aws_dynamodb_table" "this" {
 
     content {
       enabled     = true
-      kms_key_arn = var.data.server_side_encryption_kms_key_arn
+      kms_key_arn = aws_kms_key.this.arn
     }
   }
 
@@ -106,3 +106,7 @@ resource "aws_dynamodb_table" "this" {
 
 }
 
+resource "aws_kms_key" "this" {
+  description = "CMK for encrypting DynamoDB table"
+  enable_key_rotation = true
+}
