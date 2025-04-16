@@ -90,7 +90,8 @@ resource "aws_dynamodb_table" "this" {
   tags = merge(
     var.data.tags,
     {
-      "Name" = var.data.name
+      "Name" = var.data.name,
+      "backup" = true
     }
   )
 
