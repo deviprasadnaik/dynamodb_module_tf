@@ -1,4 +1,4 @@
 variable "data" {
-  description = "All variables from json file"
+  description = "all variables from json file"
 }
 
