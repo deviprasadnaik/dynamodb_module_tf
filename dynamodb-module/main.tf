@@ -111,3 +111,7 @@ resource "aws_kms_key" "this" {
   description = "CMK for encrypting DynamoDB table"
   enable_key_rotation = true
 }
+
+resource "aws_dynamodb_contributor_insights" "this" {
+  table_name = aws_dynamodb_table.this[0].name
+}
